@@ -2,7 +2,8 @@ import base64
 import json
 import threading
 import unittest
-from urllib.request import urlopen
+from urllib.error import HTTPError
+from urllib.request import Request, urlopen
 from unittest.mock import Mock, patch
 
 import server
@@ -293,11 +294,14 @@ class HttpEndpointTests(unittest.TestCase):
         self.http_server = server.ThreadingHTTPServer(("127.0.0.1", 0), server.VazifyHandler)
         self.thread = threading.Thread(target=self.http_server.serve_forever, daemon=True)
         self.thread.start()
+        self.old_api_rate_limits = server._api_rate_limits
+        server._api_rate_limits = server.OrderedDict()
 
     def tearDown(self):
         self.http_server.shutdown()
         self.thread.join()
         self.http_server.server_close()
+        server._api_rate_limits = self.old_api_rate_limits
 
     def test_config_exposes_only_public_supabase_credentials(self):
         with patch.dict("os.environ", {
@@ -344,6 +348,44 @@ class HttpEndpointTests(unittest.TestCase):
     def test_responses_include_hsts_header(self):
         with urlopen(f"http://127.0.0.1:{self.http_server.server_port}/health") as response:
             self.assertEqual(response.headers.get("Strict-Transport-Security"), "max-age=31536000")
+
+    def test_responses_include_content_security_policy(self):
+        with urlopen(f"http://127.0.0.1:{self.http_server.server_port}/") as response:
+            policy = response.headers.get("Content-Security-Policy", "")
+        self.assertIn("default-src 'self'", policy)
+        self.assertIn("object-src 'none'", policy)
+        self.assertIn("frame-ancestors 'none'", policy)
+        self.assertIn("cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0", policy)
+
+    def test_jobs_endpoint_rate_limits_each_client(self):
+        url = f"http://127.0.0.1:{self.http_server.server_port}/api/jobs"
+        with patch.object(server, "load_jobs", return_value={"jobs": []}) as load_jobs:
+            for _ in range(server.API_RATE_LIMIT_CAPACITY):
+                with urlopen(url) as response:
+                    self.assertEqual(response.status, 200)
+            request = Request(url, headers={"CF-Connecting-IP": "192.0.2.1"})
+            with urlopen(request) as response:
+                self.assertEqual(response.status, 200)
+            with self.assertRaises(HTTPError) as error:
+                urlopen(url)
+            error.exception.close()
+
+        self.assertEqual(error.exception.code, 429)
+        self.assertGreaterEqual(int(error.exception.headers["Retry-After"]), 1)
+        self.assertEqual(load_jobs.call_count, server.API_RATE_LIMIT_CAPACITY + 1)
+
+    def test_rate_limiter_refills_tokens(self):
+        key = "test-client"
+        for _ in range(server.API_RATE_LIMIT_CAPACITY):
+            allowed, retry_after = server.allow_api_request(key, now=100.0)
+            self.assertTrue(allowed)
+            self.assertEqual(retry_after, 0)
+        allowed, retry_after = server.allow_api_request(key, now=100.0)
+        self.assertFalse(allowed)
+        self.assertEqual(retry_after, 1)
+        allowed, retry_after = server.allow_api_request(key, now=101.0)
+        self.assertTrue(allowed)
+        self.assertEqual(retry_after, 0)
 
 
 class CacheTests(unittest.TestCase):

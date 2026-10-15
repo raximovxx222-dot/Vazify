@@ -39,6 +39,8 @@ Upwork va Fiverr e’lonlari avtomatik yig‘ilmaydi; qidiruv tugmalari ularning
 
 Sayt barcha javoblarda bir yil amal qiladigan HSTS sarlavhasini yuboradi (brauzer bu siyosatni faqat HTTPS javobidan qabul qiladi). Supabase JavaScript bundle’i aniq `2.118.0` versiyasiga pin qilingan va SRI SHA-384 bilan tekshiriladi; bundle tarkibi o‘zgarsa brauzer uni bajarmaydi.
 
+Content Security Policy tashqi skriptlarni faqat SRI bilan pin qilingan Supabase CDN bundle’iga ruxsat beradi; boshqa script, object va iframe’lar bloklanadi. `/api/jobs` endpointi mijoz IP bo‘yicha 30 so‘rotdan boshlanadigan, soniyasiga bittadan tiklanadigan token-bucket limiti bilan himoyalangan. Cloudflare orqali kelganda mijoz manzili `CF-Connecting-IP` sarlavhasidan olinadi; lokal ishga tushirishda socket manzili ishlatiladi. Bu limit bitta server jarayoni uchun xotirada yuritiladi; ko‘p nusxali deploy’da Cloudflare WAF yoki umumiy Redis kabi markaziy limit kerak bo‘ladi.
+
 ## Ishga tushirish
 
 Python 3.10 yoki yangiroq kerak. Loyiha papkasida:

@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import base64
 import binascii
+import ipaddress
 import json
 import os
 import re
 import threading
 import time
 import unicodedata
+from collections import OrderedDict
 from datetime import date, datetime, timedelta, timezone
 from html.parser import HTMLParser
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
@@ -24,6 +26,10 @@ PORT = int(os.environ.get("PORT", "8000"))
 CACHE_TTL_SECONDS = 600
 MIN_REFRESH_INTERVAL_SECONDS = 60
 MAX_RESPONSE_BYTES = 4_000_000
+API_RATE_LIMIT_CAPACITY = 30
+API_RATE_LIMIT_REFILL_PER_SECOND = 1.0
+API_RATE_LIMIT_CLIENTS = 2048
+API_RATE_LIMIT_IDLE_SECONDS = 3600
 USER_AGENT = "VazifyJobSearchDemo/1.0 (public listing reader)"
 CHANNELS = (
     ("freelancery_uz", "Freelancery UZ"),
@@ -636,6 +642,45 @@ SOURCES: tuple[tuple[str, str, Callable[[], list[dict[str, str]]]], ...] = tuple
 _cache_lock = threading.Lock()
 _cache: dict[str, CachedSource] = {}
 _last_refresh = 0.0
+_rate_limit_lock = threading.Lock()
+_api_rate_limits: OrderedDict[str, tuple[float, float]] = OrderedDict()
+
+
+def client_rate_limit_key(handler: SimpleHTTPRequestHandler) -> str:
+    forwarded_ip = handler.headers.get("CF-Connecting-IP", "").strip()
+    try:
+        return str(ipaddress.ip_address(forwarded_ip))
+    except ValueError:
+        return str(handler.client_address[0])
+
+
+def allow_api_request(client_key: str, now: float | None = None) -> tuple[bool, int]:
+    current_time = time.monotonic() if now is None else now
+    with _rate_limit_lock:
+        stale_keys = [
+            key for key, (_, last_seen) in _api_rate_limits.items()
+            if current_time - last_seen >= API_RATE_LIMIT_IDLE_SECONDS
+        ]
+        for key in stale_keys:
+            _api_rate_limits.pop(key, None)
+
+        tokens, last_seen = _api_rate_limits.get(
+            client_key,
+            (float(API_RATE_LIMIT_CAPACITY), current_time),
+        )
+        tokens = min(
+            float(API_RATE_LIMIT_CAPACITY),
+            tokens + max(0.0, current_time - last_seen) * API_RATE_LIMIT_REFILL_PER_SECOND,
+        )
+        allowed = tokens >= 1.0
+        if allowed:
+            tokens -= 1.0
+        retry_after = 0 if allowed else max(1, int((1.0 - tokens) / API_RATE_LIMIT_REFILL_PER_SECOND + 0.999))
+        _api_rate_limits[client_key] = (tokens, current_time)
+        _api_rate_limits.move_to_end(client_key)
+        while len(_api_rate_limits) > API_RATE_LIMIT_CLIENTS:
+            _api_rate_limits.popitem(last=False)
+        return allowed, retry_after
 
 
 def load_jobs(force: bool = False) -> dict[str, object]:
@@ -754,6 +799,23 @@ class VazifyHandler(SimpleHTTPRequestHandler):
 
     def end_headers(self) -> None:
         self.send_header("Strict-Transport-Security", "max-age=31536000")
+        self.send_header(
+            "Content-Security-Policy",
+            "default-src 'self'; "
+            "script-src 'self' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js; "
+            "style-src 'self'; "
+            "img-src 'self' data:; "
+            "font-src 'self' data:; "
+            "connect-src 'self' https://*.supabase.co wss://*.supabase.co; "
+            "object-src 'none'; "
+            "base-uri 'self'; "
+            "frame-ancestors 'none'; "
+            "form-action 'self'",
+        )
+        self.send_header("X-Content-Type-Options", "nosniff")
+        self.send_header("X-Frame-Options", "DENY")
+        self.send_header("Referrer-Policy", "strict-origin-when-cross-origin")
+        self.send_header("Permissions-Policy", "camera=(), geolocation=(), microphone=()")
         super().end_headers()
 
     def do_GET(self) -> None:
@@ -775,6 +837,20 @@ class VazifyHandler(SimpleHTTPRequestHandler):
                     super().do_GET()
                     return
             self.send_error(404)
+            return
+        allowed, retry_after = allow_api_request(client_rate_limit_key(self))
+        if not allowed:
+            body = json.dumps(
+                {"error": "So‘rovlar limiti oshdi. Birozdan keyin qayta urinib ko‘ring."},
+                ensure_ascii=False,
+            ).encode("utf-8")
+            self.send_response(429)
+            self.send_header("Content-Type", "application/json; charset=utf-8")
+            self.send_header("Content-Length", str(len(body)))
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("Retry-After", str(retry_after))
+            self.end_headers()
+            self.wfile.write(body)
             return
         params = parse_qs(parsed.query)
         result = load_jobs(force=params.get("refresh") == ["1"])
