@@ -2,6 +2,7 @@ services:
   - type: web
     name: vazify
     runtime: python
+    plan: free
     buildCommand: python -m py_compile server.py
     startCommand: python server.py
     healthCheckPath: /health

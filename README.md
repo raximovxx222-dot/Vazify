@@ -49,7 +49,7 @@ Ish e’lonlarini olish uchun tashqi Python kutubxonasi/API kaliti talab qilinma
 
 ## Render’da joylash
 
-Repository rootidagi `render.yaml` Render Blueprint deployment sozlamalarini belgilaydi. Git repository’ni Render’ga ulang yoki Blueprint yarating; Supabase sozlanmagan holda ham sayt ishlaydi va ma’lumotlarni shu brauzerda saqlaydi. Akkauntlar sinxronlashini keyin yoqish uchun Render environment variables’ga `SUPABASE_URL` va `SUPABASE_ANON_KEY` ni kiriting. Render `HOST=0.0.0.0` va `PORT`-ni beradi; lokal ishga tushirish esa `127.0.0.1:8000` manzilida qoladi. Health check `/health` endpoint’idan foydalanadi.
+Repository rootidagi `render.yaml` Render Blueprint deployment sozlamalarini belgilaydi va bepul web service rejasidan foydalanadi. Git repository-ni Render-ga ulang yoki Render-da Blueprint yarating; Supabase sozlanmasa ham sayt ishga tushadi va ma’lumotlar brauzerda saqlanadi. Akkaunt sinxronlashini keyin yoqish uchun Render environment variables-ga `SUPABASE_URL` va `SUPABASE_ANON_KEY` ni kiriting. Render `HOST=0.0.0.0` va `PORT`-ni beradi; lokal ishga tushirish esa `127.0.0.1:8000` manzilida qoladi. Health check `/health` endpointidan foydalanadi.
 
 ## Supabase akkauntlari va sinxronlash
 
