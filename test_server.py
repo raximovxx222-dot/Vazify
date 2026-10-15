@@ -148,6 +148,35 @@ class ListingFilterTests(unittest.TestCase):
         self.assertEqual(server.parse_deadline("Отклик до 14 октября", now).isoformat(), "2026-10-14")
         self.assertEqual(server.parse_deadline("Ariza 14 oktabrgacha", now).isoformat(), "2026-10-14")
 
+    def test_marks_only_explicit_uzbekistan_locations_as_local(self):
+        local = {
+            "title": "Remote designer",
+            "description": "Design work for a small team.",
+            "location": "Tashkent, Uzbekistan",
+        }
+        global_job = {
+            "title": "Uzbek language tutor",
+            "description": "Teach Uzbek to international learners.",
+            "location": "Worldwide",
+        }
+
+        self.assertEqual(server.listing_market(local), "uzbekistan")
+        self.assertEqual(server.listing_market(global_job), "global")
+
+    def test_includes_market_when_normalizing_listing(self):
+        listing = {
+            "id": "local",
+            "title": "Dizayner kerak",
+            "description": "Ish Toshkentda",
+            "url": "https://t.me/channel/22",
+            "kind": "telegram",
+            "category": "design",
+        }
+
+        results, _ = server.filter_listings([listing])
+
+        self.assertEqual(results[0]["market"], "uzbekistan")
+
 
 class ArbeitnowTests(unittest.TestCase):
     def test_keeps_only_remote_jobs_with_trusted_source_links(self):

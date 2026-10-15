@@ -300,6 +300,62 @@ def classify_listing(job: dict[str, str]) -> str:
     return "unrelated"
 
 
+UZBEKISTAN_MARKERS = (
+    "uzbekistan",
+    "o'zbekiston",
+    "o‘zbekiston",
+    "tashkent",
+    "toshkent",
+    "samarkand",
+    "samarqand",
+    "bukhara",
+    "buxoro",
+    "andijan",
+    "andijon",
+    "namangan",
+    "fergana",
+    "farg'ona",
+    "farg‘ona",
+    "nukus",
+    "qarshi",
+    "karshi",
+    "termez",
+    "termiz",
+    "urgench",
+    "urganch",
+    "jizzakh",
+    "jizzax",
+    "navoi",
+    "navoiy",
+    "khiva",
+    "xiva",
+    "узбекистан",
+    "ташкент",
+    "самарканд",
+    "бухара",
+    "андижан",
+    "наманган",
+    "фергана",
+    "нукус",
+    "карши",
+    "термез",
+    "ургенч",
+    "джизак",
+    "навои",
+    "хива",
+)
+
+
+def listing_market(job: dict[str, str]) -> str:
+    text = normalize_text(" ".join((
+        job.get("title", ""),
+        job.get("description", ""),
+        job.get("location", ""),
+        job.get("details", ""),
+    )))
+    return "uzbekistan" if any(normalize_text(marker) in text for marker in UZBEKISTAN_MARKERS) else "global"
+
+
 def parse_posted_date(value: str) -> datetime | None:
     if not value:
         return None
@@ -412,6 +468,7 @@ def filter_listings(
         unique.append({
             **job,
             "category": skill_category,
+            "market": listing_market(job),
             "skillLabel": SKILL_LABELS.get(skill_category, SKILL_LABELS["other"]),
             "listingType": listing_type,
             "listingLabel": LISTING_TYPES[listing_type],

@@ -11,7 +11,8 @@
   };
 
   const taskCards = [...document.querySelectorAll('.task-card')];
-  const filterButtons = [...document.querySelectorAll('.filter-chip')];
+  const filterButtons = [...document.querySelectorAll('.filter-chip[data-filter]')];
+  const marketFilterButtons = [...document.querySelectorAll('[data-market-filter]')];
   const searchInput = document.getElementById('taskSearch');
   const taskCount = document.getElementById('taskCount');
   const emptyState = document.getElementById('emptyState');
@@ -26,6 +27,7 @@
   const skillPreferenceStatus = document.getElementById('skillPreferenceStatus');
   const skillStorageKey = 'vazify.skillPreferences';
   const favoritesStorageKey = 'vazify.savedListings';
+  const marketFilterStorageKey = 'vazify.marketFilter';
   const notificationsStorageKey = 'vazify.notificationsEnabled';
   const seenListingsStorageKey = 'vazify.seenListings';
   const replyTemplateStorageKey = 'vazify.replyTemplate';
@@ -59,6 +61,7 @@
   let cloudSaveTimer = 0;
   let lastHandledUserId = '';
   let activeFilter = 'all';
+  let activeMarketFilter = 'uzbekistan';
   let toastTimer;
   let lastFocusedElement = null;
 
@@ -394,6 +397,21 @@
     }
   }
 
+  function readMarketFilter() {
+    try {
+      const saved = window.localStorage.getItem(marketFilterStorageKey);
+      if (saved === 'uzbekistan' || saved === 'global') activeMarketFilter = saved;
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : 'Brauzer saqlash xatosi.';
+      showToast(`Hudud filtri sozlamasini o‘qib bo‘lmadi: ${detail}`);
+    }
+    marketFilterButtons.forEach(button => {
+      const selected = button.dataset.marketFilter === activeMarketFilter;
+      button.classList.toggle('active', selected);
+      button.setAttribute('aria-pressed', String(selected));
+    });
+  }
+
   function readNotificationSettings() {
     try {
       notificationsEnabled = window.localStorage.getItem(notificationsStorageKey) === 'true'
@@ -578,6 +596,7 @@
 
   readSkillPreferences();
   readSavedListings();
+  readMarketFilter();
   readNotificationSettings();
   loadReplyTemplate();
   notificationButton.addEventListener('click', toggleNotifications);
@@ -599,7 +618,15 @@
   function safeJobUrl(value) {
     try {
       const url = new URL(value);
-      const allowedHosts = new Set(['t.me', 'arbeitnow.com', 'www.arbeitnow.com', 'jobicy.com', 'www.jobicy.com']);
+      const allowedHosts = new Set([
+        't.me',
+        'arbeitnow.com',
+        'www.arbeitnow.com',
+        'jobicy.com',
+        'www.jobicy.com',
+        'remoteok.com',
+        'www.remoteok.com',
+      ]);
       return url.protocol === 'https:' && allowedHosts.has(url.hostname) ? url.href : null;
     } catch {
       return null;
@@ -628,6 +655,7 @@
       card.dataset.jobUrl = job.url;
       card.dataset.search = `${job.title} ${job.description} ${job.source || ''} ${job.company || ''} ${job.location || ''} ${job.details || ''}`.toLocaleLowerCase('uz-UZ');
       card.dataset.listingType = job.listingType || 'unrelated';
+      card.dataset.market = job.market || 'global';
       card.dataset.skillCategory = job.category || 'other';
 
       const top = document.createElement('div');
@@ -772,8 +800,9 @@
       const skillMatches = activeFilter === 'favorites'
         || selectedSkills.size === 0
         || selectedSkills.has(card.dataset.skillCategory);
+      const marketMatches = card.dataset.market === activeMarketFilter;
       const textMatches = !query || card.dataset.search.includes(query);
-      card.hidden = !categoryMatches || !skillMatches || !textMatches;
+      card.hidden = !categoryMatches || !skillMatches || !marketMatches || !textMatches;
       if (!card.hidden) visibleLiveCount += 1;
     });
     liveJobCount.textContent = `${visibleLiveCount} ta ko‘rinmoqda`;
@@ -794,6 +823,21 @@
     });
     renderLiveJobs();
   }));
+  marketFilterButtons.forEach(button => button.addEventListener('click', () => {
+    activeMarketFilter = button.dataset.marketFilter;
+    marketFilterButtons.forEach(item => {
+      const selected = item === button;
+      item.classList.toggle('active', selected);
+      item.setAttribute('aria-pressed', String(selected));
+    });
+    try {
+      window.localStorage.setItem(marketFilterStorageKey, activeMarketFilter);
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : 'Brauzer saqlash xatosi.';
+      showToast(`Hudud filtri ishlaydi, ammo saqlanmadi: ${detail}`);
+    }
+    renderLiveJobs();
+  }));
   searchInput.addEventListener('input', applyFilters);
   document.getElementById('resetFilters').addEventListener('click', () => {
     activeFilter = 'all';
@@ -803,6 +847,18 @@
       item.classList.toggle('active', selected);
       item.setAttribute('aria-pressed', String(selected));
     });
+    activeMarketFilter = 'uzbekistan';
+    marketFilterButtons.forEach(item => {
+      const selected = item.dataset.marketFilter === activeMarketFilter;
+      item.classList.toggle('active', selected);
+      item.setAttribute('aria-pressed', String(selected));
+    });
+    try {
+      window.localStorage.setItem(marketFilterStorageKey, activeMarketFilter);
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : 'Brauzer saqlash xatosi.';
+      showToast(`Filtrlar tozalandi, ammo hudud filtri saqlanmadi: ${detail}`);
+    }
     renderLiveJobs();
   });
 

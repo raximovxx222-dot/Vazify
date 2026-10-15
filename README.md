@@ -8,6 +8,7 @@ Vazify — ochiq Telegram e’lonlarini va masofaviy ish vakansiyalarini ko‘rs
 - Arbeitnow’ning ochiq API’sidan masofaviy e’lonlarni ko‘rsatish; har bir natijada asl manba havolasi bor
 - Jobicy ochiq API’dagi masofaviy ishlarni Jobicy manbasi va asl e’lon havolasi bilan ko‘rsatish
 - Remote OK ochiq API’dagi masofaviy ishlarni Remote OK manbasi va asl e’lon havolasi bilan ko‘rsatish
+- Joylashuvi yoki matnida O‘zbekiston/shaharlari aniq ko‘rsatilgan e’lonlarni ajratish; qolganlarini global filtrda ko‘rsatish
 - Olingan e’lonlarni matn bo‘yicha filtrlash
 - E’lonlarni freelance zakaz, ish/vakansiya va aloqasiz post sifatida ajratish
 - 30 kundan eski, yopilgan yoki muddati o‘tgan e’lonlarni yashirish; takroriy havola/matnni birlashtirish
@@ -22,7 +23,7 @@ Vazify — ochiq Telegram e’lonlarini va masofaviy ish vakansiyalarini ko‘rs
 
 ## Muhim cheklovlar
 
-Bu loyiha ish topish yoki pul olishni kafolatlamaydi. Telegram natijalari ochiq kanal preview’laridan, Arbeitnow, Jobicy va Remote OK natijalari esa ularning API’laridan olinadi; masofaviy vakansiyalarning hammasi freelance zakaz emas. Har bir listing manba havolasi va atributsiyasi bilan ko‘rsatiladi.
+Bu loyiha ish topish yoki pul olishni kafolatlamaydi. Telegram natijalari ochiq kanal preview’laridan, Arbeitnow, Jobicy va Remote OK natijalari esa ularning API’laridan olinadi; masofaviy vakansiyalarning hammasi freelance zakaz emas. “O‘zbekistonda” filtri faqat joylashuvi yoki matnida mamlakat/shahar nomi aniq bor e’lonlarni topadi; qolgan e’lonlar global natijalarda qoladi va geografik moslik kafolatlanmaydi. Har bir listing manba havolasi va atributsiyasi bilan ko‘rsatiladi.
 
 Tasnif matndagi kalit iboralarga asoslangan avtomatik taxmin: `Zakaz + ish` filtri aloqasiz postlarni yashiradi, `Ishga aloqasiz` filtrida ularni ko‘rish mumkin. Ishonchli yakuniy tasnif uchun asl postni tekshiring. 30 kundan eski postlar, yopilgani/ijrochi topilgani yozilgan postlar va o‘tgan muddati bor e’lonlar ko‘rsatilmaydi. Takrorlar bir xil URL yoki normallashtirilgan sarlavha-matn orqali topiladi.
 
