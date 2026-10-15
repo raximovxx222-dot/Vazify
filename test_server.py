@@ -223,6 +223,42 @@ class JobicyTests(unittest.TestCase):
         self.assertEqual(jobs[0]["category"], "development")
 
 
+class RemoteOKTests(unittest.TestCase):
+    def test_keeps_trusted_remoteok_jobs_and_attributes_source(self):
+        response = [
+            {"legal": "Link back to Remote OK"},
+            {
+                "id": "123",
+                "position": "Remote Python developer",
+                "url": "https://remoteok.com/remote-jobs/remote-python-developer-123",
+                "description": "<p>Build <strong>Python</strong> services.</p>",
+                "company": "Example",
+                "location": "Worldwide",
+                "tags": ["python", "development"],
+                "date": "2026-10-15T10:00:00+00:00",
+            },
+            {
+                "id": "124",
+                "position": "Untrusted link",
+                "url": "https://example.com/jobs/124",
+            },
+            {
+                "id": "125",
+                "position": "Insecure link",
+                "url": "http://remoteok.com/jobs/125",
+            },
+        ]
+        with patch.object(server, "read_url", return_value=json.dumps(response).encode("utf-8")):
+            jobs = server.fetch_remoteok()
+
+        self.assertEqual(len(jobs), 1)
+        self.assertEqual(jobs[0]["title"], "Remote Python developer")
+        self.assertEqual(jobs[0]["description"], "Build Python services.")
+        self.assertEqual(jobs[0]["source"], "Remote OK · masofaviy ish")
+        self.assertEqual(jobs[0]["details"], "python, development")
+        self.assertEqual(jobs[0]["category"], "development")
+
+
 class HttpEndpointTests(unittest.TestCase):
     def setUp(self):
         self.http_server = server.ThreadingHTTPServer(("127.0.0.1", 0), server.VazifyHandler)

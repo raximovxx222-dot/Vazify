@@ -664,7 +664,9 @@
       const sourceName = document.createElement('strong');
       sourceName.textContent = job.kind === 'telegram'
         ? 'Telegram kanalida'
-        : job.source && job.source.includes('Jobicy') ? 'Jobicy’da' : 'Arbeitnow’da';
+        : job.source && job.source.includes('Remote OK') ? 'Remote OK’da'
+          : job.source && job.source.includes('Jobicy') ? 'Jobicy’da'
+            : job.source && job.source.includes('Arbeitnow') ? 'Arbeitnow’da' : 'Manba saytida';
       attribution.append(attributionLabel, sourceName);
 
       const link = document.createElement('a');

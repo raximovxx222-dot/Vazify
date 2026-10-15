@@ -527,12 +527,53 @@ def fetch_jobicy() -> list[dict[str, str]]:
     return jobs[:40]
 
 
+def fetch_remoteok() -> list[dict[str, str]]:
+    content = read_url("https://remoteok.com/api")
+    payload = json.loads(content.decode("utf-8"))
+    if not isinstance(payload, list):
+        raise ValueError("Remote OK API kutilgan e’lonlar ro‘yxatini qaytarmadi.")
+
+    jobs: list[dict[str, str]] = []
+    for row in payload:
+        if not isinstance(row, dict) or not row.get("id"):
+            continue
+        url = row.get("url")
+        parsed_url = urlsplit(url) if isinstance(url, str) else None
+        if (
+            parsed_url is None
+            or parsed_url.scheme != "https"
+            or parsed_url.hostname not in {"remoteok.com", "www.remoteok.com"}
+        ):
+            continue
+        title = str(row.get("position") or row.get("title") or "Masofaviy ish")
+        text_parser = PlainTextParser()
+        text_parser.feed(str(row.get("description") or ""))
+        description = " ".join(" ".join(text_parser.parts).split())
+        tags = row.get("tags")
+        details = [str(value) for value in tags if isinstance(value, str)] if isinstance(tags, list) else []
+        jobs.append({
+            "id": f"remoteok:{row['id']}",
+            "title": title,
+            "description": description[:1600],
+            "url": url,
+            "source": "Remote OK · masofaviy ish",
+            "publishedAt": str(row.get("date") or ""),
+            "kind": "job",
+            "company": str(row.get("company") or ""),
+            "location": str(row.get("location") or ""),
+            "details": ", ".join(details[:5]),
+            "category": categorize(" ".join([title, description, *details])),
+        })
+    return jobs[:40]
+
+
 SOURCES: tuple[tuple[str, str, Callable[[], list[dict[str, str]]]], ...] = tuple(
     (f"telegram:{channel}", f"Telegram · {label}", lambda channel=channel, label=label: fetch_telegram(channel, label))
     for channel, label in CHANNELS
 ) + (
     ("arbeitnow", "Arbeitnow · masofaviy ish", fetch_arbeitnow),
     ("jobicy", "Jobicy · masofaviy ish", fetch_jobicy),
+    ("remoteok", "Remote OK · masofaviy ish", fetch_remoteok),
 )
 
 _cache_lock = threading.Lock()

@@ -7,6 +7,7 @@ Vazify — ochiq Telegram e’lonlarini va masofaviy ish vakansiyalarini ko‘rs
 - Telegram’ning ochiq web sahifalaridan oxirgi postlarni olish: `freelancery_uz`, `freelanceteam_uz`, `MaxFreelance_uz`
 - Arbeitnow’ning ochiq API’sidan masofaviy e’lonlarni ko‘rsatish; har bir natijada asl manba havolasi bor
 - Jobicy ochiq API’dagi masofaviy ishlarni Jobicy manbasi va asl e’lon havolasi bilan ko‘rsatish
+- Remote OK ochiq API’dagi masofaviy ishlarni Remote OK manbasi va asl e’lon havolasi bilan ko‘rsatish
 - Olingan e’lonlarni matn bo‘yicha filtrlash
 - E’lonlarni freelance zakaz, ish/vakansiya va aloqasiz post sifatida ajratish
 - 30 kundan eski, yopilgan yoki muddati o‘tgan e’lonlarni yashirish; takroriy havola/matnni birlashtirish
@@ -21,7 +22,7 @@ Vazify — ochiq Telegram e’lonlarini va masofaviy ish vakansiyalarini ko‘rs
 
 ## Muhim cheklovlar
 
-Bu loyiha ish topish yoki pul olishni kafolatlamaydi. Telegram natijalari ochiq kanal preview’laridan, Arbeitnow va Jobicy natijalari esa ularning API’laridan olinadi; masofaviy vakansiyalarning hammasi freelance zakaz emas. Har bir listing manba havolasi va atributsiyasi bilan ko‘rsatiladi.
+Bu loyiha ish topish yoki pul olishni kafolatlamaydi. Telegram natijalari ochiq kanal preview’laridan, Arbeitnow, Jobicy va Remote OK natijalari esa ularning API’laridan olinadi; masofaviy vakansiyalarning hammasi freelance zakaz emas. Har bir listing manba havolasi va atributsiyasi bilan ko‘rsatiladi.
 
 Tasnif matndagi kalit iboralarga asoslangan avtomatik taxmin: `Zakaz + ish` filtri aloqasiz postlarni yashiradi, `Ishga aloqasiz` filtrida ularni ko‘rish mumkin. Ishonchli yakuniy tasnif uchun asl postni tekshiring. 30 kundan eski postlar, yopilgani/ijrochi topilgani yozilgan postlar va o‘tgan muddati bor e’lonlar ko‘rsatilmaydi. Takrorlar bir xil URL yoki normallashtirilgan sarlavha-matn orqali topiladi.
 
@@ -33,7 +34,7 @@ Saqlangan e’lonlar va javob shabloni ham shu brauzerda saqlanadi; saqlangan e�
 
 `@rakhimov_x21` shaxsiy akkaunt sifatida ishlatilmaydi. Faqat foydalanuvchi ko‘rsatgan ochiq kanallar o‘qiladi; xususiy akkaunt, xususiy xabarlar yoki login ma’lumotlariga kirilmaydi. Manba saytlari mavjudlik, format yoki foydalanish qoidalarini o‘zgartirsa, manba holati xato ko‘rsatishi mumkin. Ochiq manbalardan foydalanishdan oldin tegishli shartlarni tekshiring.
 
-Upwork va Fiverr e’lonlari avtomatik yig‘ilmaydi; qidiruv tugmalari ularning qidiruv sahifasini ochadi. Buning uchun rasmiy API ruxsati/integratsiyasi talab etilishi mumkin. Jobicy ochiq API’si bevosita manba havolasi va atributsiyani talab qiladi; kartalar shu talabga amal qiladi. Remotive e’lonlarini email/akkaunt yig‘ish orqali ko‘rsatishni cheklagani sababli, bu loyiha uchun qo‘shilmadi. Sayt buyurtmachidan haq olmaydi va sizga pul to‘lamaydi; ishga qabul qilish va to‘lov manba platformasidagi mijoz/kelishuvga bog‘liq.
+Upwork va Fiverr e’lonlari avtomatik yig‘ilmaydi; qidiruv tugmalari ularning qidiruv sahifasini ochadi. Buning uchun rasmiy API ruxsati/integratsiyasi talab etilishi mumkin. Jobicy va Remote OK ochiq API’lari manba havolasi hamda atributsiyani talab qiladi; kartalar shu talabga amal qiladi. Remotive uchinchi tomon ish-saytlariga e’lon joylashni, jumladan akkaunt/email yig‘ish bilan ko‘rsatishni cheklagani sababli, bu loyiha uchun qo‘shilmadi. hh.uz ochiq API qidiruv endpointi ushbu muhitdan 403 qaytargani sababli, ishonchli ishlashi tasdiqlanmaguncha u manbaga ulanmagan. Sayt buyurtmachidan haq olmaydi va sizga pul to‘lamaydi; ishga qabul qilish va to‘lov manba platformasidagi mijoz/kelishuvga bog‘liq.
 
 ## Ishga tushirish
 
