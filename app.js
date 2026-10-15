@@ -40,6 +40,7 @@
   const accountStatus = document.getElementById('accountStatus');
   const signInButton = document.getElementById('signIn');
   const signUpButton = document.getElementById('signUp');
+  const googleSignInButton = document.getElementById('googleSignIn');
   const signOutButton = document.getElementById('signOut');
   const themeToggle = document.getElementById('themeToggle');
   const themeIcon = themeToggle.querySelector('.theme-icon');
@@ -106,6 +107,7 @@
   function updateAccountControls() {
     const signedIn = Boolean(accountUser);
     accountForm.hidden = !supabaseClient || signedIn;
+    googleSignInButton.hidden = !supabaseClient || signedIn;
     signOutButton.hidden = !signedIn;
   }
 
@@ -320,6 +322,22 @@
   });
   signUpButton.addEventListener('click', () => {
     if (accountForm.reportValidity()) void submitAccount('signup');
+  });
+  googleSignInButton.addEventListener('click', async () => {
+    if (!supabaseClient) return;
+    googleSignInButton.disabled = true;
+    accountStatus.textContent = 'Google orqali kirish sahifasiga yo‘naltirilmoqda…';
+    try {
+      const { error } = await supabaseClient.auth.signInWithOAuth({
+        provider: 'google',
+        options: { redirectTo: window.location.origin },
+      });
+      if (error) throw error;
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : 'Google orqali kirishda xato.';
+      accountStatus.textContent = `Google orqali kirib bo‘lmadi: ${detail}`;
+      googleSignInButton.disabled = false;
+    }
   });
   signOutButton.addEventListener('click', async () => {
     if (!supabaseClient) return;

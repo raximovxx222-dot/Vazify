@@ -60,6 +60,18 @@ Repository rootidagi `render.yaml` Render Blueprint deployment sozlamalarini bel
 5. Supabase Auth URL Configuration’da Render saytingiz URL’ini Site URL va redirect allow-list’ga qo‘shing.
 6. Saytni Render HTTPS URL’i orqali oching. Supabase sozlanmaganida ma’lumotlar avvalgidek shu brauzerda qoladi; akkauntga kirgach e’lonlar, ko‘nikmalar va javob shabloni sinxronlanadi.
 
+### Google orqali kirish
+
+Vazify’da Google OAuth tugmasi mavjud. Uni yoqish uchun:
+
+1. Google Cloud’da OAuth consent screen’ni sozlab, Web application turidagi OAuth Client yarating.
+2. Google Cloud’dagi authorized JavaScript origin sifatida `https://vazify.onrender.com` ni kiriting.
+3. Google Cloud’dagi authorized redirect URI sifatida Supabase Auth Google provider sahifasida ko‘rsatilgan callback URL’ni kiriting.
+4. Supabase Authentication → Providers → Google’da provider’ni yoqing va Google Client ID hamda Client Secret’ni kiriting.
+5. Supabase Authentication → URL Configuration’da `https://vazify.onrender.com` Site URL va redirect allow-list’da borligini tekshiring.
+
+Google bilan kirishda email manzili Google orqali tasdiqlanadi; Supabase’ning inglizcha email tasdiqlash xati yuborilmaydi. Email/parol orqali alohida ro‘yxatdan o‘tish esa email tasdiqlash sozlamasiga muvofiq ishlashda davom etadi. OAuth Client Secret’ni brauzerga yoki GitHub repository’ga qo‘ymang; faqat Supabase dashboard’iga kiriting.
+
 Localhost’da Supabase sinxronlashni sinash uchun PowerShell oynasida haqiqiy project URL va public anon key’ni o‘rnating, so‘ng serverni shu oynada ishga tushiring:
 
 ```powershell

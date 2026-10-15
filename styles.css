@@ -176,6 +176,8 @@ body{background:#fff;overflow-x:clip}
 .account-form input{width:100%;min-width:0;padding:9px 10px;border:1px solid #dfe5ef;border-radius:9px;color:var(--ink);font:inherit;font-size:12px}
 .account-form input:focus{outline:3px solid rgba(0,191,166,.2);border-color:var(--teal-dark)}
 .account-actions{display:flex;gap:7px}
+.google-sign-in{margin-top:13px}
+.google-sign-in span{display:inline-grid;width:18px;height:18px;place-items:center;margin-right:5px;border:1px solid #dfe5ef;border-radius:50%;color:#4285f4;font-size:12px;font-weight:800;line-height:1}
 .account-form button:disabled,.account-panel button:disabled{opacity:.55;cursor:wait}
 @media(max-width:760px){.listing-tools{grid-template-columns:1fr}}
 @media(max-width:600px){
