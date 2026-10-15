@@ -1,0 +1,12 @@
+services:
+  - type: web
+    name: vazify
+    runtime: python
+    buildCommand: python -m py_compile server.py
+    startCommand: python server.py
+    healthCheckPath: /health
+    envVars:
+      - key: HOST
+        value: 0.0.0.0
+      - key: PYTHON_VERSION
+        value: 3.12.0
