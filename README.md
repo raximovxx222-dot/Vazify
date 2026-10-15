@@ -37,6 +37,8 @@ Saqlangan e’lonlar va javob shabloni ham shu brauzerda saqlanadi; saqlangan e�
 
 Upwork va Fiverr e’lonlari avtomatik yig‘ilmaydi; qidiruv tugmalari ularning qidiruv sahifasini ochadi. Buning uchun rasmiy API ruxsati/integratsiyasi talab etilishi mumkin. Jobicy va Remote OK ochiq API’lari manba havolasi hamda atributsiyani talab qiladi; kartalar shu talabga amal qiladi. Remotive uchinchi tomon ish-saytlariga e’lon joylashni, jumladan akkaunt/email yig‘ish bilan ko‘rsatishni cheklagani sababli, bu loyiha uchun qo‘shilmadi. hh.uz ochiq API qidiruv endpointi ushbu muhitdan 403 qaytargani sababli, ishonchli ishlashi tasdiqlanmaguncha u manbaga ulanmagan. Sayt buyurtmachidan haq olmaydi va sizga pul to‘lamaydi; ishga qabul qilish va to‘lov manba platformasidagi mijoz/kelishuvga bog‘liq.
 
+Sayt barcha javoblarda bir yil amal qiladigan HSTS sarlavhasini yuboradi (brauzer bu siyosatni faqat HTTPS javobidan qabul qiladi). Supabase JavaScript bundle’i aniq `2.118.0` versiyasiga pin qilingan va SRI SHA-384 bilan tekshiriladi; bundle tarkibi o‘zgarsa brauzer uni bajarmaydi.
+
 ## Ishga tushirish
 
 Python 3.10 yoki yangiroq kerak. Loyiha papkasida:

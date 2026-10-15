@@ -752,6 +752,10 @@ class VazifyHandler(SimpleHTTPRequestHandler):
     def __init__(self, *args: object, **kwargs: object) -> None:
         super().__init__(*args, directory=str(ROOT), **kwargs)
 
+    def end_headers(self) -> None:
+        self.send_header("Strict-Transport-Security", "max-age=31536000")
+        super().end_headers()
+
     def do_GET(self) -> None:
         parsed = urlsplit(self.path)
         if parsed.path == "/health":

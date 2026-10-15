@@ -341,6 +341,10 @@ class HttpEndpointTests(unittest.TestCase):
             payload = json.loads(response.read())
         self.assertEqual(payload, {"status": "ok"})
 
+    def test_responses_include_hsts_header(self):
+        with urlopen(f"http://127.0.0.1:{self.http_server.server_port}/health") as response:
+            self.assertEqual(response.headers.get("Strict-Transport-Security"), "max-age=31536000")
+
 
 class CacheTests(unittest.TestCase):
     def setUp(self):
